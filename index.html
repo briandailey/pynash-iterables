@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      /* Two-column layout */
+      .left-column {
+        color: #777;
+        width: 20%;
+        height: 92%;
+        float: left;
+      }
+        .left-column h2:last-of-type, .left-column h3:last-child {
+          color: #000;
+        }
+      .right-column {
+        width: 75%;
+        float: right;
+        padding-top: 1em;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; font-size: 1.5em; }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+
+# What are iterables?
+# How do I use them?
+
+PyNash October 2015
+
+
+---
+template: inverse
+
+# What's an iterable?
+
+An iterable is anything over which you can _iterate_.
+
+If you can loop over it, it's probably an iterable.
+
+---
+layout: false
+.left-column[
+  ## Example
+]
+.right-column[
+```terminal
+In [1]: iterable_list = [1,2,3,4]
+
+In [2]: for i in iterable_list:
+   ...:     print(i)
+   ...:
+1
+2
+3
+4
+```
+]
+
+
+---
+layout: false
+.left-column[
+  ## Example
+]
+.right-column[
+```python
+iterable_list = [1,2,3,4]
+
+for i in iterable_list:
+  print(i)
+```
+
+### Output
+```terminal
+1
+2
+3
+4
+```
+]
+
+
+---
+class: center, middle, inverse
+
+## How does it iterate?
+
+# `object.__iter__`
+
+---
+
+`l.__iter__()` returns an `iterator`
+
+```terminal
+In [1]: l = [1,2,3,4]
+
+In [5]: pointer = l.__iter__()
+
+In [6]: pointer
+Out[6]: &lt;list_iterator at 0x1116642e8&gt;
+
+In [8]: next(pointer)
+Out[8]: 1
+
+In [9]: next(pointer)
+Out[9]: 2
+
+In [10]: next(pointer)
+Out[10]: 3
+
+In [11]: next(pointer)
+Out[11]: 4
+```
+
+An iterator has a `__next__` method.
+
+---
+class: center, middle, inverse
+
+## What happens if I call
+# `next(pointer)`
+## on this iterator again?
+
+
+---
+
+```terminal
+In [11]: next(pointer)
+Out[11]: 4
+
+In [12]: next(pointer)
+---------------------------------------------------------------------------
+StopIteration                             Traceback (most recent call last)
+&lt;ipython-input-12-ebf92218e69a&gt; in &lt;module&gt;()
+----&gt; 1 next(pointer)
+
+StopIteration:
+```
+
+---
+class: center, middle, inverse
+
+## `StopIteration` is raised
+
+This is how a loop knows to stop!
+
+---
+
+This is an iterable, too!
+
+```python
+s = 'cookies'
+```
+
+It has a `__getitem__` method that allows us to lookup by index.
+
+```terminal
+In [13]: s = 'cookies'
+
+In [14]: s[0]
+Out[14]: 'c'
+
+In [15]: s[-1]
+Out[15]: 's'
+```
+
+---
+
+We can also loop over the string.
+
+```terminal
+In [16]: for i in s:
+   ....:     print(i)
+   ....:
+c
+o
+o
+k
+i
+e
+s
+```
+
+---
+
+Or, I can get clever and return an iterator.
+
+```terminal
+In [22]: i = iter(s)
+
+In [23]: next(i)
+Out[23]: 'c'
+
+In [24]: next(i)
+Out[24]: 'o'
+
+In [25]: i.__next__()
+Out[25]: 'o'
+
+In [26]: i.__next__()
+Out[26]: 'k'
+```
+
+---
+
+You can also cast this to a list or a tuple.
+
+```terminal
+In [32]: s = 'cookies'
+
+In [33]: list(s)
+Out[33]: ['c', 'o', 'o', 'k', 'i', 'e', 's']
+```
+
+
+---
+
+What do you think will happen?
+
+```terminal
+In [34]: s = 'cookies'
+
+In [35]: i = iter(s)
+
+In [36]: next(i)
+Out[36]: 'c'
+
+In [37]: next(i)
+Out[37]: 'o'
+
+In [38]: list(i)
+```
+
+--
+
+```terminal
+Out[38]: ['o', 'k', 'i', 'e', 's']
+```
+
+---
+## Remember we said that an _iterable_ is an object with `__getitem__` or `__iter__`
+
+---
+
+## Whereas an _iterator_ is something that has a `__next__` method.
+
+---
+class: middle, center, inverse
+
+# So what can we do with iterables?
+
+---
+class: middle, center, inverse
+
+# Built-in methods!
+
+---
+
+```terminal
+In [4]: l = [True, True, False]
+
+In [5]: any(l)
+Out[5]: True
+
+In [6]: all(l)
+Out[6]: False
+
+In [11]: l = [('flavor', 'chocolate chip'),
+  ('count', 'too many')]
+
+In [12]: dict(l)
+Out[12]: {'count': 'too many',
+  'flavor': 'chocolate chip'}
+```
+
+---
+```terminal
+In [14]: for index, detail in enumerate(l):
+    print(index, detail)
+   ....:
+0 ('flavor', 'chocolate chip')
+1 ('count', 'too many')
+```
+
+---
+```terminal
+In [32]: l1 = [1,2,3,4]
+
+In [33]: l2 = [5,6,7,8]
+
+In [34]: l3 = zip(l1, l2)
+
+In [35]: print(l3)
+```
+
+What will happen?
+--
+
+```terminal
+In [35]: print(l3)
+&lt;zip object at 0x10e69b848&gt;
+```
+
+Python3 thing here, `zip` returns an iterator!
+
+--
+
+We can, however, cast to a list.
+
+```terminal
+In [36]: print(list(l3))
+[(1, 5), (2, 6), (3, 7), (4, 8)]
+```
+
+---
+class: middle, center, inverse
+
+# List Comprehension!
+
+---
+
+```terminal
+In [15]: l = [1,2,3,4]
+
+In [16]: [i + 1 for i in l]
+Out[16]: [2, 3, 4, 5]
+```
+--
+```terminal
+In [18]: [i for i in l if i &gt; 2]
+Out[18]: [3, 4]
+```
+
+---
+class: middle, center, inverse
+
+# Generators!
+
+---
+class: middle, center
+
+### `raise OutOfScopeError`
+
+---
+
+# `itertools`!
+
+---
+```terminal
+In [37]: import itertools
+
+In [38]: itertools.chain(l1, l2)
+Out[38]: &lt;itertools.chain at 0x10e6b9470&gt;
+
+In [39]: list(itertools.chain(l1, l2))
+Out[39]: [1, 2, 3, 4, 5, 6, 7, 8]
+```
+
+... and more!
+
+---
+template: inverse
+
+# Thank you!
+
+@byeliad
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script type="text/javascript">
+      var hljs = remark.highlighter.engine;
+    </script>
+    <script src="terminal.language.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+        highlightStyle: 'solarized_dark'
+      });
+      // extract the embedded styling from ansi spans
+      $('code.terminal > span.hljs-ansi').replaceWith(function(i, x) {
+        return x.replace(/<(\/?(\w+).*?)>/g, '<$1>')
+      });
+    </script>
+  </body>
+</html>
